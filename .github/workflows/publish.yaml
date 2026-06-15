@@ -4,6 +4,13 @@ name: release-please
 "on":
   push:
     branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  packages: write
+  pull-requests: write
 
 jobs:
   release-please:
@@ -16,17 +23,35 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v6
-        if: ${{ steps.release.outputs.release_created }}
+        if: ${{ steps.release.outputs.release_created == 'true' || github.event_name == 'workflow_dispatch' }}
 
-      - name: Build and publish to GitHub Package
-        uses: actionshub/publish-gem-to-github@main
-        if: ${{ steps.release.outputs.release_created }}
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        if: ${{ steps.release.outputs.release_created == 'true' || github.event_name == 'workflow_dispatch' }}
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          owner: ${{ secrets.OWNER }}
+          ruby-version: '3.3'
+          bundler-cache: false
 
-      - name: Build and publish to RubyGems
-        uses: actionshub/publish-gem-to-rubygems@main
-        if: ${{ steps.release.outputs.release_created }}
-        with:
-          token: ${{ secrets.RUBYGEMS_API_KEY }}
+      - name: Build gem
+        if: ${{ steps.release.outputs.release_created == 'true' || github.event_name == 'workflow_dispatch' }}
+        run: gem build chef-ruby-lvm-attrib.gemspec
+
+      - name: Publish to GitHub Package
+        if: ${{ steps.release.outputs.release_created == 'true' || github.event_name == 'workflow_dispatch' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p ~/.gem
+          printf -- "---\n:github: Bearer %s\n" "$GITHUB_TOKEN" > ~/.gem/credentials
+          chmod 0600 ~/.gem/credentials
+          gem push --key github --host "https://rubygems.pkg.github.com/${GITHUB_REPOSITORY_OWNER}" chef-ruby-lvm-attrib-*.gem
+
+      - name: Publish to RubyGems
+        if: ${{ steps.release.outputs.release_created == 'true' || github.event_name == 'workflow_dispatch' }}
+        env:
+          RUBYGEMS_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
+        run: |
+          mkdir -p ~/.gem
+          printf -- "---\n:rubygems: %s\n" "$RUBYGEMS_API_KEY" > ~/.gem/credentials
+          chmod 0600 ~/.gem/credentials
+          gem push --key rubygems chef-ruby-lvm-attrib-*.gem
