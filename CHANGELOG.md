@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## [0.7.2](https://github.com/sous-chefs/chef-ruby-lvm-attrib/compare/v0.7.1...v0.7.2) (2026-06-15)
+
+
+### Bug Fixes
+
+* repair gem publishing workflow ([fa51611](https://github.com/sous-chefs/chef-ruby-lvm-attrib/commit/fa516115181da8ae39f38680adc953529233557e))
+
 ## [0.7.1](https://github.com/sous-chefs/chef-ruby-lvm-attrib/compare/v0.7.0...v0.7.1) (2026-06-09)
 
 
