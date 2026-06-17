@@ -1,5 +1,7 @@
 # chef-ruby-lvm-attrib
 
+This Gem is Deprecated and not needed anymore in the latest version of the lvm cookbook. Please update to use the cookbook lvm v7.x+.
+
 [![Gem Version](https://badge.fury.io/rb/chef-ruby-lvm-attrib.svg)](https://badge.fury.io/rb/chef-ruby-lvm-attrib)
 
 This is a list of attributes for lvm objects. They are generated from the source code and broken down by version. See [adding attributes](#updating-for-new-lvm-releases) below to contribute.
